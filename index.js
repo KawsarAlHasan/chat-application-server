@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const userRoutes = require('./routes/userRoutes')
 const User = require('./models/User')
 const Message = require('./models/Message')
 const rooms = ['General', 'Love💖', 'Tech🚀', 'Brackup😥']
@@ -10,7 +9,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
 
-app.use('/users', userRoutes)
 require('./connection')
 
 const server = require('http').createServer(app)
@@ -21,6 +19,40 @@ const io = require('socket.io')(server, {
     methods: ['GET', 'PORT'],
   },
 })
+
+// user test start
+
+app.post('/users', async (req, res) => {
+  try {
+    const { name, email, fEmail, password, picture } = req.body
+    console.log(req.body)
+    const user = await User.create({ name, email, fEmail, password, picture })
+    res.status(201).json(user)
+  } catch (e) {
+    let msg
+    if (e.code == 11000) {
+      msg = 'User already exists'
+    } else {
+      msg = e.message
+    }
+    res.status(400).json(msg)
+  }
+})
+
+// login user
+app.post('/users/login', async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const user = await User.findByCredentials(email, password)
+    user.status = 'online'
+    await user.save()
+    res.status(200).json(user)
+  } catch (e) {
+    res.status(400).json(e.message)
+  }
+})
+
+// user end
 
 async function getLastMessagesFromRoom(room) {
   let roomMessages = await Message.aggregate([
