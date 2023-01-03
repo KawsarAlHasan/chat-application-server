@@ -5,26 +5,25 @@ const User = require('./models/User')
 const Message = require('./models/Message')
 const rooms = ['General', 'Love💖', 'Tech🚀', 'Brackup😥']
 const cors = require('cors')
-const mongoose = require('mongoose')
-require('dotenv').config()
-
-mongoose.connect(
-  `mongodb+srv://love-messages:Eo2ZP60Wlkc3ogKE@cluster0.pmj8vq0.mongodb.net/love-messages?retryWrites=true&w=majority`,
-  () => {
-    console.log('connected to mongodb')
-  },
-)
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
 
 app.use('/users', userRoutes)
+require('./connection')
 
 const server = require('http').createServer(app)
 const PORT = process.env.PORT || 5001
 const io = require('socket.io')(server, {
-  cors: {},
+  cors: {
+    origin: [
+      'http://localhost:3000',
+      'https://real-love-message.web.app',
+      'http://localhost:3001',
+    ],
+    methods: ['GET', 'POST', 'PUT'],
+  },
 })
 
 async function getLastMessagesFromRoom(room) {
@@ -95,11 +94,6 @@ io.on('connection', (socket) => {
 
 app.get('/rooms', (req, res) => {
   res.json(rooms)
-})
-
-app.get('/test', (req, res) => {
-  const a = ['test', 'test2', 'test3', 'test4']
-  res.json(a)
 })
 
 app.get('/', (req, res) => {
