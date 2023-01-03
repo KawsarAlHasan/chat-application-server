@@ -17,7 +17,11 @@ const server = require('http').createServer(app)
 const PORT = process.env.PORT || 5001
 const io = require('socket.io')(server, {
   cors: {
-    origin: '*',
+    origin: [
+      'http://localhost:3000',
+      'https://real-love-message.web.app',
+      'http://localhost:3001',
+    ],
     methods: ['GET', 'PORT'],
   },
 })
