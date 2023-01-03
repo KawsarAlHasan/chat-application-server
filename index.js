@@ -16,14 +16,7 @@ require('./connection')
 const server = require('http').createServer(app)
 const PORT = process.env.PORT || 5001
 const io = require('socket.io')(server, {
-  cors: {
-    origin: [
-      'http://localhost:3000',
-      'https://real-love-message.web.app',
-      'http://localhost:3001',
-    ],
-    methods: ['GET', 'PORT'],
-  },
+  cors: {},
 })
 
 async function getLastMessagesFromRoom(room) {
@@ -94,6 +87,11 @@ io.on('connection', (socket) => {
 
 app.get('/rooms', (req, res) => {
   res.json(rooms)
+})
+
+app.get('/test', (req, res) => {
+  const a = ['test', 'test2', 'test3', 'test4']
+  res.json(a)
 })
 
 app.get('/', (req, res) => {
